@@ -76,9 +76,9 @@ const FolderGridLayout = ({
 
   return (
     <div className="rounded bg-white shadow-sm dark:bg-gray-900 dark:text-gray-100">
-      <div className="flex items-center border-b border-gray-900/10 px-3 text-xs font-bold uppercase tracking-widest text-gray-600 dark:border-gray-500/30 dark:text-gray-400">
+      {/*<div className="flex items-center border-b border-gray-900/10 px-3 text-xs font-bold uppercase tracking-widest text-gray-600 dark:border-gray-500/30 dark:text-gray-400">
         <div className="flex-1">{`${folderChildren.length} item(s)`}</div>
-        {/*<div className="flex p-1.5 text-gray-700 dark:text-gray-400">
+        <div className="flex p-1.5 text-gray-700 dark:text-gray-400">
           <Checkbox
             checked={totalSelected}
             onChange={toggleTotalSelected}
@@ -108,8 +108,8 @@ const FolderGridLayout = ({
               <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} size="lg" />
             </button>
           )}
-        </div>*/}
-      </div>
+        </div>
+      </div>*/}
 
       <div className="grid grid-cols-2 gap-3 p-3 md:grid-cols-4">
         {folderChildren.map((c: OdFolderChildren) => (
@@ -121,16 +121,16 @@ const FolderGridLayout = ({
               {c.folder ? (
                 <div>
                   <span
-                    title={'Copy folder permalink'}
+                    title={'复制文件夹直链'}
                     className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                     onClick={() => {
                       clipboard.copy(`${getBaseUrl()}${getReadablePath(getItemPath(c.name))}`)
-                      toast('Copied folder permalink.', { icon: '👌' })
+                      toast.success('已复制')
                     }}
                   >
                     <FontAwesomeIcon icon={['far', 'copy']} />
                   </span>
-                  {folderGenerating[c.id] ? (
+                  {/*{folderGenerating[c.id] ? (
                     <Downloading title={'Downloading folder, refresh page to cancel'} style="px-1.5 py-1" />
                   ) : (
                     <span
@@ -140,22 +140,22 @@ const FolderGridLayout = ({
                     >
                       <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
                     </span>
-                  )}
+                  )}*/}
                 </div>
               ) : (
                 <div>
                   <span
-                    title={'Copy raw file permalink'}
+                    title={'复制文件直链'}
                     className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                     onClick={() => {
                       clipboard.copy(`${getBaseUrl()}/api/raw/?path=${getItemPath(c.name)}`)
-                      toast.success('Copied raw file permalink.')
+                      toast.success('已复制')
                     }}
                   >
                     <FontAwesomeIcon icon={['far', 'copy']} />
                   </span>
                   <a
-                    title={'Download file'}
+                    title={'下载文件'}
                     className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                     href={`${getBaseUrl()}/api/raw?path=${getItemPath(c.name)}${
                       hashedToken ? `&odpt=${hashedToken}` : ''

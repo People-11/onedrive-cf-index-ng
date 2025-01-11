@@ -40,7 +40,7 @@ const VideoPlayer: FC<{
         track?.setAttribute('src', URL.createObjectURL(resp.data))
       })
       .catch(() => {
-        console.log('Could not load subtitle.')
+        console.log('字幕加载失败')
       })
 
     if (isFlv) {
@@ -108,7 +108,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
         {error ? (
           <FourOhFour errorMsg={error.message} />
         ) : loading && isFlv ? (
-          <Loading loadingText={'Loading FLV extension...'} />
+          <Loading loadingText={'加载 FLV 扩展...'} />
         ) : (
           <VideoPlayer
             videoName={file.name}
@@ -128,7 +128,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
           <DownloadButton
             onClickCallback={() => window.open(videoUrl)}
             btnColor="blue"
-            btnText={'Download'}
+            btnText={'下载'}
             btnIcon="file-download"
           />
           <DownloadButton
@@ -137,7 +137,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
               toast.success('Copied direct link to clipboard.')
             }}
             btnColor="pink"
-            btnText={'Copy direct link'}
+            btnText={'复制直链'}
             btnIcon="copy"
           />
           {/*<DownloadButton
@@ -162,7 +162,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             btnText="PotPlayer"
             btnImage="/players/potplayer.png"
           />
-          <DownloadButton
+          {/*<DownloadButton
             onClickCallback={() => window.open(`nplayer-http://${window?.location.hostname ?? ''}${videoUrl}`)}
             btnText="nPlayer"
             btnImage="/players/nplayer.png"
@@ -171,7 +171,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             onClickCallback={() => window.open(`intent://${getBaseUrl()}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
             btnText="mpv-android"
             btnImage="/players/mpv-android.png"
-          />
+          />*/}
         </div>
       </DownloadBtnContainer>
     </>

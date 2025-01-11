@@ -52,18 +52,18 @@ const FolderListLayout = ({
 
   return (
     <div className="rounded bg-white shadow-sm dark:bg-gray-900 dark:text-gray-100">
-      <div className="grid grid-cols-12 items-center space-x-2 border-b border-gray-900/10 px-3 dark:border-gray-500/30">
-        <div className="col-span-12 py-2 text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:col-span-6">
-          {'Name'}
+      <div className="grid grid-cols-11 items-center space-x-2 border-b border-gray-900/10 px-3 dark:border-gray-500/30">
+        <div className="col-span-12 py-2 text-sm font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:col-span-6">
+          {'名称'}
         </div>
-        <div className="col-span-3 hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
-          {'Last Modified'}
+        <div className="col-span-3 hidden text-sm font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
+          {'修改日期'}
         </div>
-        <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
-          {'Size'}
+        <div className="hidden text-sm font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
+          {'大小'}
         </div>
-        <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
-          {'Actions'}
+        <div className="hidden text-sm font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
+          {'\u00A0\u00A0操作'}
         </div>
         {/*<div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
           <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
@@ -102,7 +102,7 @@ const FolderListLayout = ({
 
       {folderChildren.map((c: OdFolderChildren) => (
         <div
-          className="grid grid-cols-12 transition-all duration-100 hover:bg-gray-100 dark:hover:bg-gray-850"
+          className="grid grid-cols-11 transition-all duration-100 hover:bg-gray-100 dark:hover:bg-gray-850"
           key={c.id}
         >
           <Link
@@ -116,16 +116,16 @@ const FolderListLayout = ({
           {c.folder ? (
             <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
               <span
-                title={'Copy folder permalink'}
+                title={'复制文件夹直链'}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 onClick={() => {
                   clipboard.copy(`${getBaseUrl()}${getReadablePath(`${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`)}`)
-                  toast('Copied folder permalink.', { icon: '👌' })
+                  toast.success('已复制')
                 }}
               >
                 <FontAwesomeIcon icon={['far', 'copy']} />
               </span>
-              {folderGenerating[c.id] ? (
+              {/*{folderGenerating[c.id] ? (
                 <Downloading title={'Downloading folder, refresh page to cancel'} style="px-1.5 py-1" />
               ) : (
                 <span
@@ -138,22 +138,22 @@ const FolderListLayout = ({
                 >
                   <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
                 </span>
-              )}
+              )}*/}
             </div>
           ) : (
             <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
               <span
-                title={'Copy raw file permalink'}
+                title={'复制文件直链'}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 onClick={() => {
                   clipboard.copy(`${getBaseUrl()}/api/raw/?path=${getItemPath(c.name)}`)
-                  toast.success('Copied raw file permalink.')
+                  toast.success('已复制')
                 }}
               >
                 <FontAwesomeIcon icon={['far', 'copy']} />
               </span>
               <a
-                title={'Download file'}
+                title={'下载文件'}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 href={`/api/raw?path=${getItemPath(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`}
               >
