@@ -89,12 +89,12 @@ const DownloadButtonGroup = () => {
           btnIcon="copy"
           btnTitle={'Copy the permalink to the file to the clipboard'}
         />
-        <DownloadButton
+        {/*<DownloadButton
           onClickCallback={() => setMenuOpen(true)}
           btnColor="teal"
           btnText={'Customise link'}
           btnIcon="pen"
-        />
+        />*/}
       </div>
     </>
   )
