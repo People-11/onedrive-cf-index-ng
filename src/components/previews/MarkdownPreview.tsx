@@ -96,7 +96,7 @@ const MarkdownPreview: FC<{
     return (
       <>
         <PreviewContainer>
-          <Loading loadingText={'Loading file content...'} />
+          <Loading loadingText={'加载文件内容...'} />
         </PreviewContainer>
         {standalone && (
           <DownloadBtnContainer>

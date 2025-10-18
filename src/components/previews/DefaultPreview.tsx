@@ -21,22 +21,22 @@ const DefaultPreview: FC<{ file: OdFileObject }> = ({ file }) => {
 
           <div className="flex flex-col space-y-2 py-4 md:flex-1">
             <div>
-              <div className="py-2 text-xs font-medium uppercase opacity-80">{'Last modified'}</div>
+              <div className="py-2 text-xs font-medium uppercase opacity-80">{'修改日期'}</div>
               <div>{formatModifiedDateTime(file.lastModifiedDateTime)}</div>
             </div>
 
             <div>
-              <div className="py-2 text-xs font-medium uppercase opacity-80">{'File size'}</div>
+              <div className="py-2 text-xs font-medium uppercase opacity-80">{'大小'}</div>
               <div>{humanFileSize(file.size)}</div>
             </div>
 
             <div>
-              <div className="py-2 text-xs font-medium uppercase opacity-80">{'MIME type'}</div>
+              <div className="py-2 text-xs font-medium uppercase opacity-80">{'MIME 信息'}</div>
               <div>{file.file?.mimeType ?? 'Unavailable'}</div>
             </div>
 
             <div>
-              <div className="py-2 text-xs font-medium uppercase opacity-80">{'Hashes'}</div>
+              <div className="py-2 text-xs font-medium uppercase opacity-80">{'Hash'}</div>
               <table className="block w-full overflow-scroll whitespace-nowrap text-sm md:table">
                 <tbody>
                   <tr className="border-y bg-white dark:border-gray-700 dark:bg-gray-900">

@@ -75,19 +75,19 @@ const DownloadButtonGroup = () => {
         <DownloadButton
           onClickCallback={() => window.open(`/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`)}
           btnColor="blue"
-          btnText={'Download'}
+          btnText={'下载'}
           btnIcon="file-download"
-          btnTitle={'Download the file directly through OneDrive'}
+          btnTitle={'直接从OneDrive下载'}
         />
         <DownloadButton
           onClickCallback={() => {
             clipboard.copy(`${getBaseUrl()}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`)
-            toast.success('Copied direct link to clipboard.')
+            toast.success('链接已复制')
           }}
           btnColor="pink"
-          btnText={'Copy direct link'}
+          btnText={'复制直链'}
           btnIcon="copy"
-          btnTitle={'Copy the permalink to the file to the clipboard'}
+          btnTitle={'复制直链'}
         />
         {/*<DownloadButton
           onClickCallback={() => setMenuOpen(true)}
