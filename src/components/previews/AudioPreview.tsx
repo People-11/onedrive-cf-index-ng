@@ -64,11 +64,11 @@ const AudioPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             </div>
 
             {!brokenThumbnail ? (
-              <div className="absolute m-4 aspect-square rounded-full shadow-lg">
+              <div className="absolute aspect-square rounded shadow-lg">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  className={`h-full w-full rounded-full object-cover object-top ${
-                    playerStatus === PlayerState.Playing ? 'animate-spin-slow' : ''
+                  className={`h-full w-full rounded object-cover object-top ${
+                    playerStatus === PlayerState.Playing ? '' : ''
                   }`}
                   src={thumbnail}
                   alt={file.name}
@@ -88,7 +88,7 @@ const AudioPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             <div>
               <div className="mb-2 font-medium">{file.name}</div>
               <div className="mb-4 text-sm text-gray-500">
-                {'Last modified:' + ' ' + formatModifiedDateTime(file.lastModifiedDateTime)}
+                {'修改日期:' + ' ' + formatModifiedDateTime(file.lastModifiedDateTime)}
               </div>
             </div>
 
