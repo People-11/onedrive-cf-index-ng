@@ -140,12 +140,12 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             btnText={'Copy direct link'}
             btnIcon="copy"
           />
-          <DownloadButton
+          {/*<DownloadButton
             onClickCallback={() => setMenuOpen(true)}
             btnColor="teal"
             btnText={'Customise link'}
             btnIcon="pen"
-          />
+          />*/}
 
           <DownloadButton
             onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}

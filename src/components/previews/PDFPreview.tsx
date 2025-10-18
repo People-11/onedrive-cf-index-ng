@@ -11,7 +11,7 @@ const PDFEmbedPreview: React.FC<{ file: any }> = ({ file }) => {
   const pdfPath = encodeURIComponent(
     `${getBaseUrl()}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`
   )
-  const url = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${pdfPath}`
+  const url = `https://pdf-preview-fix.people11.dev/?file=${pdfPath}`
 
   return (
     <div>

@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { getBaseUrl } from '../utils/getBaseUrl'
 import { humanFileSize, formatModifiedDateTime } from '../utils/fileDetails'
-
+import { getReadablePath } from '../utils/getReadablePath'
 import { Downloading, Checkbox, ChildIcon, ChildName } from './FileListing'
 import { getStoredToken } from '../utils/protectedRouteHandler'
 
@@ -65,7 +65,7 @@ const FolderListLayout = ({
         <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
           {'Actions'}
         </div>
-        <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
+        {/*<div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
           <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
             <Checkbox
               checked={totalSelected}
@@ -97,7 +97,7 @@ const FolderListLayout = ({
               </button>
             )}
           </div>
-        </div>
+        </div>*/}
       </div>
 
       {folderChildren.map((c: OdFolderChildren) => (
@@ -119,7 +119,7 @@ const FolderListLayout = ({
                 title={'Copy folder permalink'}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 onClick={() => {
-                  clipboard.copy(`${getBaseUrl()}${`${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`}`)
+                  clipboard.copy(`${getBaseUrl()}${getReadablePath(`${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`)}`)
                   toast('Copied folder permalink.', { icon: '👌' })
                 }}
               >
@@ -146,9 +146,7 @@ const FolderListLayout = ({
                 title={'Copy raw file permalink'}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 onClick={() => {
-                  clipboard.copy(
-                    `${getBaseUrl()}/api/raw?path=${getItemPath(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`
-                  )
+                  clipboard.copy(`${getBaseUrl()}/api/raw/?path=${getItemPath(c.name)}`)
                   toast.success('Copied raw file permalink.')
                 }}
               >
@@ -163,7 +161,7 @@ const FolderListLayout = ({
               </a>
             </div>
           )}
-          <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
+          {/*<div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
             {!c.folder && !(c.name === '.password') && (
               <Checkbox
                 checked={selected[c.id] ? 2 : 0}
@@ -171,7 +169,7 @@ const FolderListLayout = ({
                 title={'Select file'}
               />
             )}
-          </div>
+          </div>*/}
         </div>
       ))}
     </div>

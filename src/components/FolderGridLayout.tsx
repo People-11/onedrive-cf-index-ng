@@ -7,6 +7,7 @@ import { useClipboard } from 'use-clipboard-copy'
 
 import { getBaseUrl } from '../utils/getBaseUrl'
 import { formatModifiedDateTime } from '../utils/fileDetails'
+import { getReadablePath } from '../utils/getReadablePath'
 import { Checkbox, ChildIcon, ChildName, Downloading } from './FileListing'
 import { getStoredToken } from '../utils/protectedRouteHandler'
 
@@ -77,7 +78,7 @@ const FolderGridLayout = ({
     <div className="rounded bg-white shadow-sm dark:bg-gray-900 dark:text-gray-100">
       <div className="flex items-center border-b border-gray-900/10 px-3 text-xs font-bold uppercase tracking-widest text-gray-600 dark:border-gray-500/30 dark:text-gray-400">
         <div className="flex-1">{`${folderChildren.length} item(s)`}</div>
-        <div className="flex p-1.5 text-gray-700 dark:text-gray-400">
+        {/*<div className="flex p-1.5 text-gray-700 dark:text-gray-400">
           <Checkbox
             checked={totalSelected}
             onChange={toggleTotalSelected}
@@ -107,7 +108,7 @@ const FolderGridLayout = ({
               <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} size="lg" />
             </button>
           )}
-        </div>
+        </div>*/}
       </div>
 
       <div className="grid grid-cols-2 gap-3 p-3 md:grid-cols-4">
@@ -123,7 +124,7 @@ const FolderGridLayout = ({
                     title={'Copy folder permalink'}
                     className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                     onClick={() => {
-                      clipboard.copy(`${getBaseUrl()}${getItemPath(c.name)}`)
+                      clipboard.copy(`${getBaseUrl()}${getReadablePath(getItemPath(c.name))}`)
                       toast('Copied folder permalink.', { icon: '👌' })
                     }}
                   >
@@ -147,11 +148,7 @@ const FolderGridLayout = ({
                     title={'Copy raw file permalink'}
                     className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                     onClick={() => {
-                      clipboard.copy(
-                        `${getBaseUrl()}/api/raw?path=${getItemPath(c.name)}${
-                          hashedToken ? `&odpt=${hashedToken}` : ''
-                        }`
-                      )
+                      clipboard.copy(`${getBaseUrl()}/api/raw/?path=${getItemPath(c.name)}`)
                       toast.success('Copied raw file permalink.')
                     }}
                   >
@@ -170,7 +167,7 @@ const FolderGridLayout = ({
               )}
             </div>
 
-            <div
+            {/*<div
               className={`${
                 selected[c.id] ? 'opacity-100' : 'opacity-0'
               } absolute left-0 top-0 z-10 m-1 rounded bg-white/50 py-0.5 group-hover:opacity-100 dark:bg-gray-900/50`}
@@ -182,7 +179,7 @@ const FolderGridLayout = ({
                   title={'Select file'}
                 />
               )}
-            </div>
+            </div>*/}
 
             <Link href={getItemPath(c.name)} passHref>
               <GridItem c={c} path={getItemPath(c.name)} />
