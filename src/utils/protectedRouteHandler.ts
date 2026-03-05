@@ -28,31 +28,27 @@ export function compareHashedToken({
 }): boolean {
   return encryptToken(dotPassword.trim()) === odTokenHeader
 }
+// 预先计算编码过的受保护路径避免请求时做高昂的字符串 split 与 map 分配
+const encodedProtectedRoutes = siteConfig.protectedRoutes.reduce((acc: { original: string; encoded: string }[], r: string) => {
+  if (r) {
+    acc.push({
+      original: r,
+      encoded: r.split('/').map(p => encodeURIComponent(p)).join('/'),
+    })
+  }
+  return acc
+}, [])
+
 /**
  * Match the specified route against a list of predefined routes
  * @param route directory path
  * @returns whether the directory is protected
  */
-
 export function matchProtectedRoute(route: string): string {
-  const protectedRoutes: string[] = siteConfig.protectedRoutes
-  let authTokenPath = ''
-
-  for (const r of protectedRoutes) {
-    // protected route array could be empty
-    if (r) {
-      if (
-        route.startsWith(
-          r
-            .split('/')
-            .map(p => encodeURIComponent(p))
-            .join('/')
-        )
-      ) {
-        authTokenPath = r
-        break
-      }
+  for (const r of encodedProtectedRoutes) {
+    if (route.startsWith(r.encoded)) {
+      return r.original
     }
   }
-  return authTokenPath
+  return ''
 }

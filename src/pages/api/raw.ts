@@ -1,29 +1,37 @@
-import { posix as pathPosix } from 'path-browserify'
 import axios from 'redaxios'
 
 import { driveApi, cacheControlHeader } from '../../../config/api.config'
 import { encodePath, getAccessToken, checkAuthRoute } from '.'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'edge'
 
 export default async function handler(req: NextRequest): Promise<Response> {
   const accessToken = await getAccessToken()
   if (!accessToken) {
-    return new Response(JSON.stringify({ error: 'No access token.' }), { status: 403 })
+    return NextResponse.json({ error: 'No access token.' }, { status: 403 })
   }
 
   const { path = '/', odpt = '', proxy = false } = Object.fromEntries(req.nextUrl.searchParams)
 
   // Sometimes the path parameter is defaulted to '[...path]' which we need to handle
   if (path === '[...path]') {
-    return new Response(JSON.stringify({ error: 'No path specified.' }), { status: 400 })
+    return NextResponse.json({ error: 'No path specified.' }, { status: 400 })
   }
   // If the path is not a valid path, return 400
   if (typeof path !== 'string') {
-    return new Response(JSON.stringify({ error: 'Path query invalid.' }), { status: 400 })
+    return NextResponse.json({ error: 'Path query invalid.' }, { status: 400 })
   }
-  const cleanPath = pathPosix.resolve('/', pathPosix.normalize(path))
+  let cleanPath = path
+
+  if (cleanPath.startsWith('/')) {
+    cleanPath = cleanPath.substring(1)
+  }
+
+  // Remove trailing slashes
+  cleanPath = cleanPath.replace(/\/$/, '')
+
+  cleanPath = ('/' + cleanPath).replace(/\/$/, '')
 
   // Handle protected routes authentication
   const odTokenHeader = (req.headers.get('od-protected-token') as string) ?? odpt
@@ -31,7 +39,7 @@ export default async function handler(req: NextRequest): Promise<Response> {
   const { code, message } = await checkAuthRoute(cleanPath, accessToken, odTokenHeader)
   // Status code other than 200 means user has not authenticated yet
   if (code !== 200) {
-    return new Response(JSON.stringify({ error: message }), { status: code })
+    return NextResponse.json({ error: message }, { status: code })
   }
 
   let headers = {
@@ -74,12 +82,12 @@ export default async function handler(req: NextRequest): Promise<Response> {
         return new Response(null, { status: 302, headers: headers})
       }
     } else {
-      return new Response(JSON.stringify({ error: 'No download url found.' }), { status: 404, headers: headers })
+      return NextResponse.json({ error: 'No download url found.' }, { status: 404, headers: headers })
     }
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error?.response?.data ?? 'Internal server error.' }), {
-      status: error?.response?.status ?? 500,
-      headers: headers
-    })
+    return NextResponse.json(
+      { error: error?.response?.data ?? 'Internal server error.' }, 
+      { status: error?.response?.status ?? 500, headers: headers }
+    )
   }
 }

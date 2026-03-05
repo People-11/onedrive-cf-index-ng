@@ -1,4 +1,3 @@
-import { posix as pathPosix } from 'path-browserify'
 
 import axios from 'redaxios'
 
@@ -11,7 +10,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'edge'
 
-const basePath = pathPosix.resolve('/', siteConfig.baseDirectory)
+const basePath = siteConfig.baseDirectory === '/' ? '' : siteConfig.baseDirectory
 const clientSecret = revealObfuscatedToken(apiConfig.obfuscatedClientSecret)
 
 /**
@@ -21,11 +20,7 @@ const clientSecret = revealObfuscatedToken(apiConfig.obfuscatedClientSecret)
  * @returns Absolute path of the file inside OneDrive
  */
 export function encodePath(path: string): string {
-  let encodedPath = pathPosix.join(basePath, path)
-  if (encodedPath === '/' || encodedPath === '') {
-    return ''
-  }
-  encodedPath = encodedPath.replace(/\/$/, '')
+  let encodedPath = (basePath + (path === '/' ? '' : path)).replace(/\/$/, '')
   return `:${encodeURIComponent(encodedPath)}`
 }
 
@@ -77,6 +72,14 @@ export async function getAccessToken(): Promise<string> {
   return ''
 }
 
+// 预计算保护路径（小写、添加规范化的尾斜杠）避免在每次请求时重新正则分配
+const processedProtectedRoutes = (siteConfig.protectedRoutes as string[]).reduce((acc, r) => {
+  if (typeof r === 'string') {
+    acc.push(r.toLowerCase().replace(/\/$/, '') + '/')
+  }
+  return acc
+}, [] as string[])
+
 /**
  * Match protected routes in site config to get path to required auth token
  * @param path Path cleaned in advance
@@ -86,17 +89,12 @@ export function getAuthTokenPath(path: string) {
   // Ensure trailing slashes to compare paths component by component. Same for protectedRoutes.
   // Since OneDrive ignores case, lower case before comparing. Same for protectedRoutes.
   path = path.toLowerCase() + '/'
-  const protectedRoutes = siteConfig.protectedRoutes as string[]
-  let authTokenPath = ''
-  for (let r of protectedRoutes) {
-    if (typeof r !== 'string') continue
-    r = r.toLowerCase().replace(/\/$/, '') + '/'
+  for (const r of processedProtectedRoutes) {
     if (path.startsWith(r)) {
-      authTokenPath = `${r}.password`
-      break
+      return `${r}.password`
     }
   }
-  return authTokenPath
+  return ''
 }
 
 /**
@@ -187,32 +185,40 @@ export default async function handler(req: NextRequest): Promise<Response> {
 
   // Sometimes the path parameter is defaulted to '[...path]' which we need to handle
   if (path === '[...path]') {
-    return new Response(JSON.stringify({ error: 'No path specified.' }), { status: 400 })
+    return NextResponse.json({ error: 'No path specified.' }, { status: 400 })
   }
   // If the path is not a valid path, return 400
   if (typeof path !== 'string') {
-    return new Response(JSON.stringify({ error: 'Path query invalid.' }), { status: 400 })
+    return NextResponse.json({ error: 'Path query invalid.' }, { status: 400 })
   }
-  // Besides normalizing and making absolute, trailing slashes are trimmed
-  const cleanPath = pathPosix.resolve('/', pathPosix.normalize(path)).replace(/\/$/, '')
+  let cleanPath = path
+
+  if (cleanPath.startsWith('/')) {
+    cleanPath = cleanPath.substring(1)
+  }
+
+  // Remove trailing slashes
+  cleanPath = cleanPath.replace(/\/$/, '')
+
+  cleanPath = ('/' + cleanPath).replace(/\/$/, '')
 
   // Validate sort param
   if (typeof sort !== 'string') {
-    return new Response(JSON.stringify({ error: 'Sort query invalid.' }), { status: 400 })
+    return NextResponse.json({ error: 'Sort query invalid.' }, { status: 400 })
   }
 
   const accessToken = await getAccessToken()
 
   // Return error 403 if access_token is empty
   if (!accessToken) {
-    return new Response(JSON.stringify({ error: 'No access token.' }), { status: 403 })
+    return NextResponse.json({ error: 'No access token.' }, { status: 403 })
   }
 
   // Handle protected routes authentication
   const { code, message } = await checkAuthRoute(cleanPath, accessToken, req.headers.get('od-protected-token') as string)
   // Status code other than 200 means user has not authenticated yet
   if (code !== 200) {
-    return new Response(JSON.stringify({ error: message }), { status: code })
+    return NextResponse.json({ error: message }, { status: code })
   }
 
   const requestPath = encodePath(cleanPath)
@@ -271,8 +277,6 @@ export default async function handler(req: NextRequest): Promise<Response> {
 
     throw identityResponse.reason
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error?.response?.data ?? 'Internal server error.' }), {
-      status: error?.response?.status ?? 500,
-    })
+    return NextResponse.json({ error: error?.response?.data ?? 'Internal server error.' }, { status: error?.response?.status ?? 500 })
   }
 }

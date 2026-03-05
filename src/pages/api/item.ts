@@ -15,14 +15,11 @@ export default async function handler(req: NextRequest): Promise<Response> {
 
   // TODO: Set edge function caching for faster load times
 
-  if (typeof id === 'string') {
-    const idPattern = /^[a-zA-Z0-9]+$/
-    if (!idPattern.test(id)) {
-      // ID contains characters other than letters and numbers
-      return new Response(JSON.stringify({ error: 'Invalid driveItem ID.' }), { status: 400 })
-    }
+  if (typeof id !== 'string' || !/^[a-zA-Z0-9]+$/.test(id)) {
+    return NextResponse.json({ error: 'Invalid driveItem ID.' }, { status: 400 })
+  }
 
-    const itemApi = `${apiConfig.driveApi}/items/${id}`
+  const itemApi = `${apiConfig.driveApi}/items/${id}`
     try {
       const { data } = await axios.get(itemApi, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -32,9 +29,6 @@ export default async function handler(req: NextRequest): Promise<Response> {
       })
       return NextResponse.json(data)
     } catch (error: any) {
-      return new Response(JSON.stringify({ error: error?.response?.data ?? 'Internal server error.' }), { status: error?.response?.status ?? 500 })
-    }
-  } else {
-    return new Response(JSON.stringify({ error: 'Invalid driveItem ID.' }), { status: 400 })
+    return NextResponse.json({ error: error?.response?.data ?? 'Internal server error.' }, { status: error?.response?.status ?? 500 })
   }
 }

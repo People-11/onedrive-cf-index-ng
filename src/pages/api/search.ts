@@ -54,7 +54,7 @@ export default async function handler(req: NextRequest): Promise<Response> {
       })
       return NextResponse.json(data.value)
     } catch (error: any) {
-      return new Response(JSON.stringify({ error: error?.response?.data ?? 'Internal server error.' }), {
+      return NextResponse.json({ error: error?.response?.data ?? 'Internal server error.' }, {
         status: error?.response?.status ?? 500,
       })
     }
