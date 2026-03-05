@@ -221,17 +221,18 @@ export default async function handler(req: NextRequest): Promise<Response> {
   // Whether path is root, which requires some special treatment
   const isRoot = requestPath === ''
 
-  // Querying current path identity (file or folder) and follow up query childrens in folder
+  // 查询路径状态与子项时启用并发请求
   try {
-    const { data: identityData } = await axios.get(requestUrl, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      params: {
-        select: 'name,size,id,lastModifiedDateTime,folder,file,video,image',
-      },
-    })
+    const childrenRequestUrl = `${requestUrl}${isRoot ? '' : ':'}/children`
 
-    if ('folder' in identityData) {
-      const { data: folderData } = await axios.get(`${requestUrl}${isRoot ? '' : ':'}/children`, {
+    const [identityResponse, childrenResponse] = await Promise.allSettled([
+      axios.get(requestUrl, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        params: {
+          select: 'name,size,id,lastModifiedDateTime,folder,file,video,image',
+        },
+      }),
+      axios.get(childrenRequestUrl, {
         headers: { Authorization: `Bearer ${accessToken}` },
         params: {
           ...{
@@ -241,24 +242,37 @@ export default async function handler(req: NextRequest): Promise<Response> {
           ...(next ? { $skipToken: next } : {}),
           ...(sort ? { $orderby: sort } : {}),
         },
-      })
+      }),
+    ])
 
-      // Extract next page token from full @odata.nextLink
-      const nextPage = folderData['@odata.nextLink']
-        ? folderData['@odata.nextLink'].match(/&\$skiptoken=(.+)/i)[1]
-        : null
+    if (identityResponse.status === 'fulfilled' && 'folder' in identityResponse.value.data) {
+      if (childrenResponse.status === 'fulfilled') {
+        const folderData = childrenResponse.value.data
 
-      // Return paging token if specified
-      if (nextPage) {
-        return NextResponse.json({ folder: folderData, next: nextPage })
+        // Extract next page token from full @odata.nextLink
+        const nextPage = folderData['@odata.nextLink']
+          ? folderData['@odata.nextLink'].match(/&\$skiptoken=(.+)/i)[1]
+          : null
+
+        // Return paging token if specified
+        if (nextPage) {
+          return NextResponse.json({ folder: folderData, next: nextPage })
+        } else {
+          return NextResponse.json({ folder: folderData })
+        }
       } else {
-        return NextResponse.json({ folder: folderData })
+        throw childrenResponse.reason
       }
     }
-    return NextResponse.json({ file: identityData })
+
+    if (identityResponse.status === 'fulfilled') {
+      return NextResponse.json({ file: identityResponse.value.data })
+    }
+
+    throw identityResponse.reason
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error?.response?.data ?? 'Internal server error.' }), {
-      status: error?.response?.code ?? 500,
+      status: error?.response?.status ?? 500,
     })
   }
 }
